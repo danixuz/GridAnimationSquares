@@ -36,9 +36,19 @@ struct Home: View {
                         GeometryReader { innerProxy in
                             let rect = innerProxy.frame(in: .named("GESTURE"))
                             let scale = itemScale(rect: rect, size: size)
+                            
+                            // Instead of manual calculation we are going to use UIKit's CGAffineTransform
+                            
+                            let transformedRect = rect.applying(.init(scaleX: scale, y: scale))
+                            
+                            // Transforming the location too.
+                            let transformedLocation = location.applying(.init(scaleX: scale, y: scale))
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(Color.orange)
                                 .scaleEffect(scale)
+                            // We need to re-locate every item to current drag position
+                                .offset(x: (transformedRect.midX - rect.midX), y: (transformedRect.midY - rect.midY))
+                                .offset(x: location.x - transformedLocation.x, y: location.y - transformedLocation.y)
                         }
                         .padding(5)
                         .frame(height: width)
